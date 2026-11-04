@@ -1,0 +1,31 @@
+# Render Blueprint for TailorCV. Deploy with "New > Blueprint" in the Render dashboard.
+# Secrets marked "sync: false" are entered in the dashboard the first time you deploy.
+services:
+  - type: web
+    name: tailorcv
+    runtime: node
+    plan: starter
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /
+    disk:
+      name: tailorcv-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /data
+      - key: PORT
+        value: "3000"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: BASE_URL
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
