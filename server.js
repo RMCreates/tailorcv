@@ -12,6 +12,7 @@ import { readUpload, extractText, ExtractError } from "./lib/extract.js";
 import { markdownToDocx } from "./lib/docx-export.js";
 // ---- end file feature imports ----
 import { adminRouter } from "./lib/admin.js";
+import { sendResultReady, sendPackCode } from "./lib/email.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(/\/$/, "");
@@ -84,6 +85,7 @@ async function handlePaidSession(session) {
       const rec = await getCode(packCode);
       if (rec && rec.status === "awaiting_payment" && rec.stripeSessionId === session.id) {
         await saveCode({ ...rec, status: "active", credits: rec.credits + PACK_CREDITS, paidAt: new Date().toISOString() });
+        if (rec.email) sendPackCode({ to: rec.email, code: rec.code, credits: rec.credits + PACK_CREDITS, url: BASE_URL }).catch((e) => console.error("email error", e.message));
       }
     });
   }
@@ -169,6 +171,7 @@ async function runJob(id) {
       const { markdown, usage } = await tailor({ resume: job.resume, job: job.job });
       job = await getJob(id);
       await saveJob({ ...job, status: "done", result: markdown, usage, finishedAt: new Date().toISOString() });
+      if (job.email) sendResultReady({ to: job.email, url: `${BASE_URL}/result.html?id=${id}` }).catch((e) => console.error("email error", e.message));
     } catch (err) {
       console.error("generation error", id, err);
       job = await getJob(id);
