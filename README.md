@@ -42,15 +42,18 @@ Without `STRIPE_SECRET_KEY`, and outside production, the app skips payment so yo
 - `POST /api/checkout` validates the input, saves the order and creates a Stripe Checkout session.
 - Stripe sends the buyer to `/result.html?id=…&session_id=…`. The page polls `GET /api/jobs/:id`, which confirms with Stripe that the order is paid and then starts generation (once per order).
 - If generation fails, the buyer gets up to 3 free retries. After that the page asks them to contact support for a refund.
-- Orders are saved as JSON files in `DATA_DIR`. Move to Postgres or SQLite once volume grows.
+- Orders and credit codes are stored in a SQLite database at `DATA_DIR/tailorcv.sqlite` (Node's built-in `node:sqlite`, no native dependency). Move to Postgres once you run more than one instance.
 
 ## Included
 
 - Single orders ($9) and **5-pack credit codes** ($29). Buyers get a `TCV-XXXX-XXXX-XXXX` code to spend later. A credit is returned automatically if an order fails 3 times.
 - A Stripe webhook plus a check on the redirect page, so paid orders run even if the buyer closes the tab.
 - A per-IP rate limit on checkout and automatic deletion of orders after 30 days (`RETENTION_DAYS`).
+- Resume upload: buyers can upload a PDF or DOCX instead of pasting (`POST /api/extract`, 5 MB max, rate-limited).
+- Download the result as a Word file (`GET /api/jobs/:id/docx`) as well as Markdown or print-to-PDF.
 - 30 SEO resume guides at `/resume/`, plus `sitemap.xml`, `robots.txt`, and privacy and terms templates.
-- Tests: `npm test` covers 9 end-to-end tests with a mocked AI call.
+- A read-only admin API when `ADMIN_TOKEN` is set: `GET /api/admin/stats` (order counts, packs sold, revenue, orders per day for the last 7 days) and `GET /api/admin/jobs?status=failed&limit=50` (order metadata only, never resume text). Send `Authorization: Bearer <ADMIN_TOKEN>`.
+- Tests: `npm test` covers 11 end-to-end tests with a mocked AI call, including persistence across a restart.
 - A promo drafting bot: `npm run promo` writes a week of posts to `promo/` for you to review. See `PROMOTION.md`.
 
 ## Before you launch

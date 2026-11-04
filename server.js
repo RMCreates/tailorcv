@@ -7,6 +7,11 @@ import {
   purgeOldJobs,
 } from "./lib/store.js";
 import { rateLimit } from "./lib/rate-limit.js";
+// ---- File features (upload extraction + .docx export) ----
+import { readUpload, extractText, ExtractError } from "./lib/extract.js";
+import { markdownToDocx } from "./lib/docx-export.js";
+// ---- end file feature imports ----
+import { adminRouter } from "./lib/admin.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(/\/$/, "");
@@ -56,6 +61,8 @@ app.use(express.json({ limit: "100kb" }));
 app.use(express.static("public", { extensions: ["html"] }));
 
 const orderLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: Number(process.env.RATE_LIMIT_MAX || 10) });
+
+app.use("/api/admin", adminRouter);
 
 app.get("/api/config", (_req, res) => {
   res.json({ priceCents: PRICE_CENTS, packPriceCents: PACK_PRICE_CENTS, packCredits: PACK_CREDITS, devFree: DEV_FREE });
@@ -267,6 +274,43 @@ app.get("/api/pack/:code", async (req, res) => {
   }
   res.json({ code: rec.code, status: rec.status, credits: rec.credits });
 });
+
+// ---- File features: resume upload extraction and .docx download (added routes) ----
+const extractLimiter = rateLimit({ windowMs: 10 * 60 * 1000, max: Number(process.env.EXTRACT_RATE_LIMIT_MAX || 30) });
+
+// POST /api/extract — multipart upload of a PDF or DOCX resume; returns { text }.
+app.post("/api/extract", extractLimiter, async (req, res) => {
+  if (!/^multipart\/form-data/i.test(req.headers["content-type"] || "")) {
+    return res.status(400).json({ error: "Please send the file as a multipart form upload." });
+  }
+  try {
+    const file = await readUpload(req);
+    const { text } = await extractText(file);
+    res.json({ text: text.slice(0, MAX_RESUME), truncated: text.length > MAX_RESUME });
+  } catch (err) {
+    if (err instanceof ExtractError) return res.status(err.status).json({ error: err.message });
+    console.error("extract error", err);
+    res.status(500).json({ error: "We couldn't read that file. Please paste the text instead." });
+  }
+});
+
+// GET /api/jobs/:id/docx — the finished result as a Word document.
+app.get("/api/jobs/:id/docx", async (req, res) => {
+  const job = await getJob(req.params.id);
+  if (!job) return res.status(404).json({ error: "Not found." });
+  if (job.status !== "done" || !job.result) return res.status(409).json({ error: "This order isn't finished yet." });
+  try {
+    const buf = await markdownToDocx(job.result);
+    res.set("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    res.set("Content-Disposition", 'attachment; filename="tailored-resume.docx"');
+    res.set("Cache-Control", "no-store");
+    res.send(buf);
+  } catch (err) {
+    console.error("docx error", err);
+    res.status(500).json({ error: "Couldn't build the Word file. Try the Markdown download instead." });
+  }
+});
+// ---- end file features ----
 
 // ---- Housekeeping ----
 async function purge() {

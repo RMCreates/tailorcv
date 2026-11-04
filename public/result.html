@@ -26,6 +26,7 @@
     <div class="row actions" style="margin-bottom:16px">
       <button id="copy">Copy all</button>
       <button id="dl" class="secondary">Download .md</button>
+      <a id="dlDocx" class="btn secondary" href="#" download="tailored-resume.docx">Download .docx</a>
       <button class="secondary" onclick="print()">Print / Save as PDF</button>
       <a href="/" class="hint">Tailor for another job →</a>
     </div>
@@ -78,6 +79,7 @@ async function poll() {
     if (data.status === "done") {
       markdown = data.result;
       $("doc").innerHTML = render(markdown);
+      $("dlDocx").href = `/api/jobs/${encodeURIComponent(id)}/docx`;
       $("wait").hidden = true; $("done").hidden = false;
     }
   } catch { setTimeout(poll, 5000); }

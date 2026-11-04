@@ -30,6 +30,9 @@ button { font: inherit; font-weight: 600; background: var(--accent); color: var(
 button.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 button:disabled { opacity: .6; cursor: wait; }
 .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.upload { margin: -10px 0 18px; }
+.upload input[type=file] { width: auto; display: inline; padding: 0; margin: 0; border: 0; background: none; font-size: 14px; }
+.btn.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 .error { color: var(--warn); margin: 12px 0 0; }
 .fine { color: var(--muted); font-size: 14px; margin-top: 14px; }
 .faq h3 { margin: 28px 0 4px; font-size: 17px; }

@@ -1,0 +1,6 @@
+{
+  "resume": "jordan kim\nphone 555-0100\n\nwork history\nshift lead, target, 2021-2024\nopened and closed the store, counted the drawers, handled customer complaints, trained 10 new cashiers, made the weekly schedule for 15 people in the scheduling app\n\ncashier, target, 2019-2021\nran register, stocked shelves, helped customers find stuff\n\neducation\nhigh school diploma 2019\nsome community college classes (business) 2022-2023\n\nskills\nmicrosoft word, excel basics, friendly, fast learner",
+  "job": "Administrative Assistant\nGreenfield Dental Group\n\nWe need an organized, friendly administrative assistant for our front office.\n\nDuties: greet patients, schedule appointments, answer phones, handle payments and daily cash reconciliation, maintain records, order supplies, support the office manager.\n\nRequirements: high school diploma, 1+ years customer-facing experience, MS Office, scheduling experience, cash handling, professional communication. Dental office experience a plus.",
+  "should_appear": ["schedul", "cash", "customer", "Excel", "trained"],
+  "must_not_appear": ["dental office experience", "Dentrix", "Associate", "A.A.", "degree in business", "QuickBooks"]
+}

@@ -6,13 +6,18 @@
     "start": "node server.js",
     "dev": "node --env-file-if-exists=.env --watch server.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",
-    "promo": "node --env-file-if-exists=.env scripts/promo-drafts.js"
+    "promo": "node --env-file-if-exists=.env scripts/promo-drafts.js",
+    "eval": "node --env-file-if-exists=.env scripts/eval.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^1.4.0",
+    "busboy": "^1.6.0",
+    "docx": "^9.15.2",
     "express": "^5.3.0",
+    "mammoth": "^1.13.0",
+    "pdf-parse": "^2.4.5",
     "stripe": "^23.1.0"
   },
   "type": "module",
