@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TailorCV: your resume, rewritten for the job you want</title>
+  <meta name="description" content="Paste your resume and a job posting. Get a rewritten, ATS-friendly resume and a matching cover letter in about a minute.">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header><div class="logo">Tailor<span>CV</span></div></header>
+
+  <h1>Your resume, rewritten for the exact job you're applying to.</h1>
+  <p class="lede">Paste your resume and the job posting. In about a minute you get a resume tuned to that role's keywords and a cover letter that sounds like a person wrote it.</p>
+
+  <ul class="points">
+    <li><b>Gets past the filters</b>Uses the posting's own keywords wherever your real experience backs them up.</li>
+    <li><b>Nothing made up</b>It only uses facts from your resume. No invented jobs, skills or numbers.</li>
+    <li><b>Cover letter included</b>Specific to the company and role, under 350 words.</li>
+  </ul>
+
+  <form id="f" class="card">
+    <label for="resume">Your current resume <span class="hint">(paste the text)</span></label>
+    <textarea id="resume" required minlength="200" maxlength="20000" placeholder="Jane Doe — Product Designer&#10;Experience…"></textarea>
+
+    <label for="job">The job posting <span class="hint">(paste the full description)</span></label>
+    <textarea id="job" required minlength="100" maxlength="15000" placeholder="We're hiring a Senior Product Designer to…"></textarea>
+
+    <label for="email">Email <span class="hint">(optional, for your receipt)</span></label>
+    <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+
+    <div class="row">
+      <button id="go" type="submit">Tailor my resume</button>
+      <span id="price" class="hint"></span>
+    </div>
+    <p id="err" class="error" hidden></p>
+    <p class="fine">Secure checkout by Stripe. Your text is used only to write your documents.</p>
+  </form>
+
+  <section class="faq">
+    <h3>How long does it take?</h3>
+    <p>Usually 30–90 seconds after payment.</p>
+    <h3>Can I apply to several jobs?</h3>
+    <p>Yes. Each order tailors your resume to one posting, and tailoring for each job is what gets you interviews.</p>
+    <h3>What if something goes wrong?</h3>
+    <p>If generation fails you can retry for free. If it still doesn't work, email us for a full refund.</p>
+  </section>
+
+  <footer>© TailorCV</footer>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+let cfg = { priceCents: 900, devFree: false };
+fetch("/api/config").then(r => r.json()).then(c => {
+  cfg = c;
+  const price = "$" + (c.priceCents / 100).toFixed(c.priceCents % 100 ? 2 : 0);
+  $("go").textContent = c.devFree ? "Tailor my resume (dev: free)" : `Tailor my resume — ${price}`;
+  $("price").textContent = "One-time payment. No subscription.";
+});
+if (new URLSearchParams(location.search).has("canceled")) {
+  $("err").textContent = "Checkout was canceled. Your text is still here if you want to try again.";
+  $("err").hidden = false;
+}
+for (const k of ["resume", "job", "email"]) {
+  try { const v = sessionStorage.getItem("tcv_" + k); if (v) $(k).value = v; } catch {}
+  $(k).addEventListener("input", () => { try { sessionStorage.setItem("tcv_" + k, $(k).value); } catch {} });
+}
+$("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("err").hidden = true;
+  $("go").disabled = true;
+  try {
+    const r = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resume: $("resume").value, job: $("job").value, email: $("email").value }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Something went wrong.");
+    location.href = data.url;
+  } catch (err) {
+    $("err").textContent = err.message;
+    $("err").hidden = false;
+    $("go").disabled = false;
+  }
+});
+</script>
+</body>
+</html>

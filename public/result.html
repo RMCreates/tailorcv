@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your tailored resume · TailorCV</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header><a href="/" class="logo" style="color:inherit;text-decoration:none">Tailor<span>CV</span></a></header>
+
+  <div id="wait" class="card">
+    <div class="row"><div class="spinner"></div><b id="waitText">Confirming your payment…</b></div>
+    <p class="fine">This usually takes 30–90 seconds. Keep this tab open. You can also bookmark this page and come back later.</p>
+  </div>
+
+  <div id="fail" class="card" hidden>
+    <b>Something went wrong while writing your documents.</b>
+    <p class="fine" id="failText"></p>
+    <button id="retry">Try again (free)</button>
+  </div>
+
+  <div id="done" hidden>
+    <div class="row actions" style="margin-bottom:16px">
+      <button id="copy">Copy all</button>
+      <button id="dl" class="secondary">Download .md</button>
+      <button class="secondary" onclick="print()">Print / Save as PDF</button>
+      <a href="/" class="hint">Tailor for another job →</a>
+    </div>
+    <article id="doc" class="card doc"></article>
+  </div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const qs = new URLSearchParams(location.search);
+const id = qs.get("id");
+const sessionId = qs.get("session_id");
+let markdown = "";
+
+function esc(s) { return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function inline(s) { return esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)(.+?)\*/g, "$1<em>$2</em>"); }
+function render(md) {
+  const out = []; let list = false, para = [];
+  const flush = () => { if (para.length) { out.push("<p>" + para.map(inline).join("<br>") + "</p>"); para = []; } };
+  const endList = () => { if (list) { out.push("</ul>"); list = false; } };
+  for (const raw of md.split("\n")) {
+    const line = raw.trimEnd();
+    let m;
+    if (!line.trim()) { flush(); endList(); continue; }
+    if ((m = line.match(/^(#{1,4})\s+(.*)$/))) { flush(); endList(); const lvl = Math.min(Math.max(m[1].length, 2), 3); out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`); continue; }
+    if (/^\s*(---|\*\*\*)\s*$/.test(line)) { flush(); endList(); continue; }
+    if ((m = line.match(/^\s*[-*•]\s+(.*)$/))) { flush(); if (!list) { out.push("<ul>"); list = true; } out.push("<li>" + inline(m[1]) + "</li>"); continue; }
+    endList(); para.push(line);
+  }
+  flush(); endList();
+  return out.join("\n");
+}
+
+async function poll() {
+  if (!id) { $("waitText").textContent = "Missing order id."; return; }
+  const url = `/api/jobs/${encodeURIComponent(id)}` + (sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : "");
+  try {
+    const r = await fetch(url);
+    const data = await r.json();
+    if (!r.ok) { $("waitText").textContent = data.error || "Order not found."; return; }
+    if (data.status === "awaiting_payment") { $("waitText").textContent = "Waiting for payment confirmation…"; return setTimeout(poll, 3000); }
+    if (data.status === "generating" || data.status === "paid") { $("waitText").textContent = "Writing your tailored resume and cover letter…"; return setTimeout(poll, 3000); }
+    if (data.status === "failed") {
+      $("wait").hidden = true; $("fail").hidden = false;
+      $("retry").hidden = !data.canRetry;
+      $("failText").textContent = data.canRetry ? "You haven't been charged extra. Try again below." : "Please contact support for a full refund.";
+      return;
+    }
+    if (data.status === "done") {
+      markdown = data.result;
+      $("doc").innerHTML = render(markdown);
+      $("wait").hidden = true; $("done").hidden = false;
+    }
+  } catch { setTimeout(poll, 5000); }
+}
+$("retry").onclick = async () => {
+  $("retry").disabled = true;
+  await fetch(`/api/jobs/${encodeURIComponent(id)}/retry`, { method: "POST" });
+  $("fail").hidden = true; $("wait").hidden = false; $("retry").disabled = false;
+  poll();
+};
+$("copy").onclick = async () => { await navigator.clipboard.writeText(markdown); $("copy").textContent = "Copied ✓"; };
+$("dl").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([markdown], { type: "text/markdown" }));
+  a.download = "tailored-resume.md"; a.click();
+};
+poll();
+</script>
+</body>
+</html>
