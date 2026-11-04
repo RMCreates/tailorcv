@@ -1,0 +1,6 @@
+# Replace https://YOURDOMAIN.com with your real domain before launch.
+User-agent: *
+Disallow: /result.html
+Disallow: /api/
+
+Sitemap: https://YOURDOMAIN.com/sitemap.xml

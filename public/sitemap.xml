@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Replace https://YOURDOMAIN.com with your real domain before launch. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://YOURDOMAIN.com/</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/software-engineer.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/data-analyst.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/data-scientist.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/product-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/project-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/registered-nurse.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/teacher.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/marketing-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/sales-representative.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/customer-service-representative.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/accountant.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/financial-analyst.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/graphic-designer.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/ux-designer.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/administrative-assistant.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/operations-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/business-analyst.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/human-resources-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/mechanical-engineer.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/civil-engineer.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/pharmacist.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/physical-therapist.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/executive-assistant.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/account-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/social-media-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/content-writer.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/warehouse-associate.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/retail-store-manager.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/cybersecurity-analyst.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/resume/devops-engineer.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/privacy.html</loc><lastmod>2026-11-04</lastmod></url>
+  <url><loc>https://YOURDOMAIN.com/terms.html</loc><lastmod>2026-11-04</lastmod></url>
+</urlset>

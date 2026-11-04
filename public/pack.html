@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your credit code · TailorCV</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header><a href="/" class="logo" style="color:inherit;text-decoration:none">Tailor<span>CV</span></a></header>
+
+  <div id="wait" class="card">
+    <div class="row"><div class="spinner"></div><b id="waitText">Confirming your payment…</b></div>
+  </div>
+
+  <div id="ready" class="card" hidden>
+    <p class="hint" style="margin:0 0 6px">Your credit code</p>
+    <div class="row">
+      <code id="code" style="font-size:24px;font-weight:700;letter-spacing:.04em"></code>
+      <button id="copy" class="secondary" type="button">Copy</button>
+    </div>
+    <p><b id="credits"></b> left. <b>Save this code.</b> It's the only way to use your credits, and anyone who has it can use them.</p>
+    <div class="row"><a id="use" href="/"><button type="button">Use a credit now</button></a></div>
+  </div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const qs = new URLSearchParams(location.search);
+const code = qs.get("code");
+const sessionId = qs.get("session_id");
+async function poll(n = 0) {
+  if (!code) { $("waitText").textContent = "Missing code."; return; }
+  try {
+    const r = await fetch(`/api/pack/${encodeURIComponent(code)}` + (sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : ""));
+    const d = await r.json();
+    if (!r.ok) { $("waitText").textContent = d.error || "Code not found."; return; }
+    if (d.status !== "active") {
+      if (n > 40) { $("waitText").textContent = "We haven't received the payment confirmation yet. Refresh this page in a minute, or contact support."; return; }
+      return setTimeout(() => poll(n + 1), 3000);
+    }
+    try { localStorage.setItem("tcv_code", d.code); } catch {}
+    $("code").textContent = d.code;
+    $("credits").textContent = `${d.credits} credit${d.credits === 1 ? "" : "s"}`;
+    $("use").href = `/?code=${encodeURIComponent(d.code)}`;
+    $("wait").hidden = true; $("ready").hidden = false;
+  } catch { setTimeout(() => poll(n + 1), 5000); }
+}
+$("copy").onclick = async () => { await navigator.clipboard.writeText($("code").textContent); $("copy").textContent = "Copied ✓"; };
+poll();
+</script>
+</body>
+</html>

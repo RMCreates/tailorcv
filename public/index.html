@@ -30,6 +30,11 @@
     <label for="email">Email <span class="hint">(optional, for your receipt)</span></label>
     <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
 
+    <details id="codeBox" style="margin:-6px 0 18px">
+      <summary class="hint" style="cursor:pointer">Have a credit code?</summary>
+      <input id="code" autocomplete="off" spellcheck="false" placeholder="TCV-XXXX-XXXX-XXXX" style="margin:10px 0 0;text-transform:uppercase">
+    </details>
+
     <div class="row">
       <button id="go" type="submit">Tailor my resume</button>
       <span id="price" class="hint"></span>
@@ -37,6 +42,17 @@
     <p id="err" class="error" hidden></p>
     <p class="fine">Secure checkout by Stripe. Your text is used only to write your documents.</p>
   </form>
+
+  <section class="card" style="margin-top:20px">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <b id="packTitle">Applying to lots of jobs? Get 5 for $29.</b>
+        <p class="hint" style="margin:4px 0 0">You get a credit code to use for 5 job postings, whenever you want. It never expires.</p>
+      </div>
+      <button id="buyPack" class="secondary" type="button">Buy the 5-pack</button>
+    </div>
+    <p id="packErr" class="error" hidden></p>
+  </section>
 
   <section class="faq">
     <h3>How long does it take?</h3>
@@ -47,7 +63,7 @@
     <p>If generation fails you can retry for free. If it still doesn't work, email us for a full refund.</p>
   </section>
 
-  <footer>© TailorCV</footer>
+  <footer><nav class="footnav"><a href="/resume/">Resume guides by role</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a></nav><p>© TailorCV</p></footer>
 </div>
 <script>
 const $ = (id) => document.getElementById(id);
@@ -57,6 +73,34 @@ fetch("/api/config").then(r => r.json()).then(c => {
   const price = "$" + (c.priceCents / 100).toFixed(c.priceCents % 100 ? 2 : 0);
   $("go").textContent = c.devFree ? "Tailor my resume (dev: free)" : `Tailor my resume — ${price}`;
   $("price").textContent = "One-time payment. No subscription.";
+  const pack = "$" + (c.packPriceCents / 100).toFixed(c.packPriceCents % 100 ? 2 : 0);
+  $("packTitle").textContent = `Applying to lots of jobs? Get ${c.packCredits} for ${pack}.`;
+  $("buyPack").textContent = `Buy the ${c.packCredits}-pack`;
+});
+const qsCode = new URLSearchParams(location.search).get("code");
+try {
+  const saved = qsCode || localStorage.getItem("tcv_code");
+  if (saved) { $("code").value = saved; $("codeBox").open = true; }
+} catch {}
+$("code").addEventListener("input", () => {
+  const has = $("code").value.trim().length > 0;
+  $("go").dataset.label ??= $("go").textContent;
+  $("go").textContent = has ? "Tailor my resume (use 1 credit)" : $("go").dataset.label;
+});
+$("buyPack").addEventListener("click", async () => {
+  $("packErr").hidden = true;
+  $("buyPack").disabled = true;
+  try {
+    const r = await fetch("/api/pack", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: $("email").value }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Something went wrong.");
+    location.href = data.url;
+  } catch (err) {
+    $("packErr").textContent = err.message; $("packErr").hidden = false; $("buyPack").disabled = false;
+  }
 });
 if (new URLSearchParams(location.search).has("canceled")) {
   $("err").textContent = "Checkout was canceled. Your text is still here if you want to try again.";
@@ -74,10 +118,11 @@ $("f").addEventListener("submit", async (e) => {
     const r = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resume: $("resume").value, job: $("job").value, email: $("email").value }),
+      body: JSON.stringify({ resume: $("resume").value, job: $("job").value, email: $("email").value, code: $("code").value }),
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "Something went wrong.");
+    if ($("code").value.trim()) { try { localStorage.setItem("tcv_code", $("code").value.trim()); } catch {} }
     location.href = data.url;
   } catch (err) {
     $("err").textContent = err.message;

@@ -70,7 +70,9 @@ async function poll() {
     if (data.status === "failed") {
       $("wait").hidden = true; $("fail").hidden = false;
       $("retry").hidden = !data.canRetry;
-      $("failText").textContent = data.canRetry ? "You haven't been charged extra. Try again below." : "Please contact support for a full refund.";
+      $("failText").textContent = data.canRetry ? "You haven't been charged extra. Try again below."
+        : data.creditRefunded ? "Your credit has been returned to your code. Please try again later."
+        : "Please contact support for a full refund.";
       return;
     }
     if (data.status === "done") {

@@ -43,3 +43,20 @@ button:disabled { opacity: .6; cursor: wait; }
 .doc ul { padding-left: 20px; }
 footer { margin-top: 48px; color: var(--muted); font-size: 14px; }
 @media print { header, .actions, footer { display: none; } .card { border: 0; } }
+
+/* Static content pages (resume guides, privacy, terms) */
+.doc a, .crumbs a, .rolelist a { color: var(--accent); }
+a.logo { color: var(--ink); text-decoration: none; }
+.btn { display: inline-block; font-weight: 600; background: var(--accent); color: var(--accent-ink);
+  border-radius: 8px; padding: 14px 22px; text-decoration: none; }
+.cta { margin-top: 40px; }
+.cta h2 { margin: 0 0 8px; font-size: 22px; }
+.crumbs, .note { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+.note { display: inline-block; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; color: var(--warn); }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0 !important; }
+.tags li { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.rolelist { columns: 2 220px; padding-left: 20px; margin: 0 0 8px; }
+.rolelist li { margin-bottom: 6px; break-inside: avoid; }
+.footnav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.footnav a { color: var(--muted); }
+nav.footnav + p { margin: 8px 0 0; }

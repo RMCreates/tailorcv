@@ -4,7 +4,9 @@
   "description": "AI resume + cover letter tailoring, pay per use",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --env-file-if-exists=.env --watch server.js"
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "test": "node --test --test-concurrency=1 test/*.test.js",
+    "promo": "node --env-file-if-exists=.env scripts/promo-drafts.js"
   },
   "author": "",
   "license": "ISC",
